@@ -75,16 +75,24 @@ const App = () => {
             setNewNumber("");
           })
           .catch((error) => {
-            console.log(`error: ${error}`);
-            notficationHelper(
-              `Information of ${newPerson.name} has already been removed`,
-              false
-            );
-            setPersons(
-              persons.filter(
-                (person) => person.id !== personIdFromName(newName)
-              )
-            );
+            if (error.response) {
+              // If the number is not valid this branch executes.
+              console.log(`error: ${error.response.data.error}`);
+              notficationHelper(`${error.response.data.error}`, false);
+            } else {
+              // If the person has already been removed from the database this branch executes.
+              // Not sure about if this an elegant way to handle this.
+              console.log("error:", error);
+              notficationHelper(
+                `Information of ${newPerson.name} has already been removed`,
+                false
+              );
+              setPersons(
+                persons.filter(
+                  (person) => person.id !== personIdFromName(newName)
+                )
+              );
+            }
           })
       : personServices
           .create(newPerson)
